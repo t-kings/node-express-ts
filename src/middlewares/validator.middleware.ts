@@ -1,7 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+/**
+ * @description body payload Validator middleware
+ */
+
 import { Request, Response } from 'express';
+import {
+  SchemaType,
+  schemaValidator
+} from '../helpers/schema-validator.helpers';
 import { ResponseStatus } from '../types/response.types';
 
+/**
+ *
+ * @param this from route bind
+ * @param req from express middleware bind
+ * @param res from express middleware bind
+ * @param next from express middleware bind
+ */
 export function validator(
   this: ValidatorPayload,
   req: Request,
@@ -10,41 +26,26 @@ export function validator(
 ) {
   try {
     const body = req.body;
+
+    /**
+     * this validates just request body
+     */
     if (body) {
-      if (!this.fields) {
-        throw new Error('Validator field was not bind');
+      /**
+       * throw error if schema was not bind
+       */
+      if (!this.schema) {
+        throw new Error('Validator Schema was not bind');
       }
-      const fields = this.fields;
-      const errors: Record<string, string[]> = {};
+      const schema = this.schema;
 
-      Object.entries(fields).forEach(([field, checks]) => {
-        const bodyValue = body[field];
-        Object.entries(checks).forEach(([checkName, checkValue]) => {
-          const pushError = (error: string) => {
-            errors[bodyValue] = errors[bodyValue]
-              ? errors[bodyValue].concat([error])
-              : [error];
-          };
-          if (checkName === 'required' && checkValue === true) {
-            if (!bodyValue) {
-              pushError(`${bodyValue} is required`);
-            } else if (typeof bodyValue === 'string' && !bodyValue.trim()) {
-              pushError(`${bodyValue} is required`);
-            }
-          }
-
-          if (checkName === 'type' && typeof bodyValue !== checkValue) {
-            pushError(`${bodyValue} is of wrong type. ${checkValue} expected`);
-          }
-
-          if (checkName === 'max' && bodyValue > checkValue) {
-            pushError(`${bodyValue} is greater than ${checkValue}`);
-          }
-        });
-      });
+      const errors = schemaValidator(schema, req.body);
 
       if (Object.keys(errors).length > 0) {
-        res.sendStatus(400).json({
+        /**
+         * return with error code 400
+         */
+        return res.sendStatus(400).json({
           message: 'validation error',
           data: errors,
           meta: {},
@@ -64,13 +65,5 @@ export function validator(
 }
 
 interface ValidatorPayload {
-  fields: {
-    [t: string]: CheckerType;
-  };
-}
-
-interface CheckerType {
-  type?: string;
-  max?: number;
-  required?: boolean;
+  schema: SchemaType;
 }

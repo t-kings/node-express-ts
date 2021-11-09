@@ -1,9 +1,16 @@
+/**
+ * @description routes for :item
+ */
+
 import { itemController } from '../app';
 import { MethodType } from '../types/request.types';
 import express from 'express';
 import { validator } from '../middlewares';
 const router = express.Router();
 
+/**
+ * List of routes
+ */
 const routes = [
   {
     path: '/',
@@ -17,7 +24,7 @@ const routes = [
     method: MethodType.Post,
     middlewares: [
       validator.bind({
-        fields: {
+        schema: {
           quantity: {
             required: true,
             type: 'number'
@@ -25,7 +32,7 @@ const routes = [
           expiry: {
             required: true,
             type: 'number',
-            max: new Date().getTime()
+            min: new Date().getTime()
           }
         }
       })
@@ -43,7 +50,7 @@ const routes = [
     method: MethodType.Post,
     middlewares: [
       validator.bind({
-        fields: {
+        schema: {
           quantity: {
             required: true,
             type: 'number'
@@ -54,6 +61,9 @@ const routes = [
   }
 ];
 
+/**
+ * map routes to router
+ */
 routes.forEach((route) => {
   router[route.method](route.path, route.middlewares, route.handler);
 });

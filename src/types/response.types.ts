@@ -1,3 +1,7 @@
+/**
+ * @description custom types of response
+ */
+
 export interface ResponseType<T> {
   data: T;
   message: string;

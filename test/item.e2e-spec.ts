@@ -1,5 +1,5 @@
 /**
- * Integration Test for item paths
+ * @description Integration Test for item paths
  * @path /
  */
 
@@ -105,6 +105,7 @@ describe('Item (e2e)', () => {
       });
     });
   });
+
   /**
    * @path :item/quantity
    */
