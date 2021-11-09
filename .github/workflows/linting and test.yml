@@ -1,0 +1,17 @@
+name: Linting and Test
+on: [push]
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v2
+
+            - name: Install Node.js dependencies
+              run: yarn
+
+            - name: Run ESLint
+              run: yarn lint
+
+            - name: Run Test
+              run: yarn test
