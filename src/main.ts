@@ -3,5 +3,9 @@
  */
 
 import express from 'express';
+import { itemRoutes } from './routes';
+const app = express();
 
-export const server = express();
+app.use(itemRoutes.entry, itemRoutes.router);
+
+export const server = app;

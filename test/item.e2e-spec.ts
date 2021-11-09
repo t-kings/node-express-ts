@@ -1,5 +1,5 @@
 /**
- * Integration Test for root paths
+ * Integration Test for item paths
  * @path /
  */
 
@@ -12,7 +12,7 @@ import { checkReturnType } from './helpers';
 const request = supertest(server);
 const t0 = 1615525981224;
 
-describe('Root (e2e)', () => {
+describe('Item (e2e)', () => {
   beforeEach(() => {
     /**
      * Mock up the test database
@@ -29,22 +29,16 @@ describe('Root (e2e)', () => {
 
   describe('/wrong-path', () => {
     let status: number;
-    let data: ResponseType<unknown>;
     const path = 'this/is/definitely/a/wrong/path';
 
     beforeEach(async () => {
       const res = await request.get(`/${path}`);
       status = res.status;
-      data = res.body;
       return '';
     });
 
     it('should return 404', () => {
       expect(status).toBe(404);
-    });
-
-    describe('', () => {
-      checkReturnType(path, 'GET', data);
     });
   });
 
@@ -52,22 +46,20 @@ describe('Root (e2e)', () => {
     let status: number;
     let data: ResponseType<unknown>;
     const path = '/';
-
     beforeEach(async () => {
       const res = await request.get(path);
       status = res.status;
       data = res.body;
+      return '';
     });
-
     it('should return status 200', () => {
       expect(status).toBe(200);
     });
 
-    describe('', () => {
-      checkReturnType(path, 'GET', data);
+    it('should contain only keys of response type', () => {
+      checkReturnType(data);
     });
   });
-
   /**
    * @path :item/add
    */
@@ -78,47 +70,41 @@ describe('Root (e2e)', () => {
       const item = 'foo';
       const path = `${item}/add`;
       const payload = { expiry: t0 + 10000, quantity: 10 };
-
       beforeEach(async () => {
         const res = await request.post(`/${path}`).send(payload);
         status = res.status;
         data = res.body;
         return '';
       });
-
       it('should return 201', () => {
         expect(status).toBe(201);
       });
 
-      describe('', () => {
-        checkReturnType(path, 'POST', data);
+      it('should contain only keys of response type', () => {
+        checkReturnType(data);
       });
     });
-
     describe('with bad payload', () => {
       let status: number;
       let data: ResponseType<unknown>;
       const item = 'foo';
       const path = `${item}/add`;
       const payload = {}; // wrong payload
-
       beforeEach(async () => {
         const res = await request.post(`/${path}`).send(payload);
         status = res.status;
         data = res.body;
         return '';
       });
-
       it('should return 400', () => {
         expect(status).toBe(400);
       });
 
-      describe('', () => {
-        checkReturnType(path, 'POST', data);
+      it('should contain only keys of response type', () => {
+        checkReturnType(data);
       });
     });
   });
-
   /**
    * @path :item/quantity
    */
@@ -128,7 +114,6 @@ describe('Root (e2e)', () => {
       let data: ResponseType<unknown>;
       const item = 'foo';
       const path = `${item}/quantity`;
-
       beforeEach(async () => {
         clearMockFromDatabase();
         const res = await request.get(`/${path}`);
@@ -136,16 +121,14 @@ describe('Root (e2e)', () => {
         data = res.body;
         return '';
       });
-
       it('should return 404', () => {
         expect(status).toBe(404);
       });
 
-      describe('', () => {
-        checkReturnType(path, 'GET', data);
+      it('should contain only keys of response type', () => {
+        checkReturnType(data);
       });
     });
-
     describe('quantity exists', () => {
       let status: number;
       let data: ResponseType<{
@@ -154,7 +137,6 @@ describe('Root (e2e)', () => {
       }>;
       const item = 'foo';
       const path = `${item}/quantity`;
-
       beforeEach(async () => {
         await clearMockFromDatabase();
         await mockUpDatabase();
@@ -163,11 +145,9 @@ describe('Root (e2e)', () => {
         data = res.body;
         return '';
       });
-
       it('should return 200', () => {
         expect(status).toBe(200);
       });
-
       it('should return validTill as the nearest expiry time', () => {
         const validTimeFromMockUp = 0;
         const now = new Date().getTime();
@@ -175,12 +155,11 @@ describe('Root (e2e)', () => {
         expect(data.data.validTill).toBe(validTimeFromMockUp);
       });
 
-      describe('', () => {
-        checkReturnType(path, 'GET', data);
+      it('should contain only keys of response type', () => {
+        checkReturnType(data);
       });
     });
   });
-
   describe('/:item/sell', () => {
     describe('with correct payload', () => {
       let status: number;
@@ -188,66 +167,58 @@ describe('Root (e2e)', () => {
       const item = 'foo';
       const path = `${item}/sell`;
       const payload = { quantity: 10 };
-
       beforeEach(async () => {
         const res = await request.post(`/${path}`).send(payload);
         status = res.status;
         data = res.body;
         return '';
       });
-
       it('should return 201', () => {
         expect(status).toBe(201);
       });
 
-      describe('', () => {
-        checkReturnType(path, 'POST', data);
+      it('should contain only keys of response type', () => {
+        checkReturnType(data);
       });
     });
-
     describe('With wrong payload', () => {
       let status: number;
       let data: ResponseType<unknown>;
       const item = 'foo';
       const path = `${item}/sell`;
       const payload = {}; // wrong payload
-
       beforeEach(async () => {
         const res = await request.post(`/${path}`).send(payload);
         status = res.status;
         data = res.body;
         return '';
       });
-
       it('should return 400', () => {
         expect(status).toBe(400);
       });
 
-      describe('', () => {
-        checkReturnType(path, 'POST', data);
+      it('should contain only keys of response type', () => {
+        checkReturnType(data);
       });
     });
-
     describe('inventory are expired', () => {
       let status: number;
       let data: ResponseType<unknown>;
       const item = 'foo';
       const path = `${item}/sell`;
       const payload = { quantity: 10 };
-
       beforeEach(async () => {
         const res = await request.post(`/${path}`).send(payload);
         status = res.status;
         data = res.body;
         return '';
       });
-
       it('should return 409', () => {
         expect(status).toBe(409);
       });
 
-      describe('', () => {
-        checkReturnType(path, 'GET', data);
+      it('should contain only keys of response type', () => {
+        checkReturnType(data);
       });
     });
   });
