@@ -12,3 +12,16 @@ Logs
 
 # Environment
 .env
+
+# Test Files
+/coverage
+
+
+# yarn and npm
+yarn-error.log
+yarn.lock
+package-lock.json
+
+
+# Logs
+/log
