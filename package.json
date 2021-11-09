@@ -22,10 +22,15 @@
   "scripts": {
     "start:dev": "nodemon",
     "start": "yarn build && node build/index.js",
+    "start:debug": "nodemon --inspect",
+    "start:prod": "node build/index.js",
     "build": "tsc",
     "lint": "eslint . --ext .ts --fix",
     "lint:format": "yarn format && yarn lint",
     "prepare": "husky install",
-    "format": "prettier --config .prettierrc src/**/*.ts --write"
+    "format": "prettier --config .prettierrc src/**/*.ts --write",
+    "test": "",
+    "test:e2e": "",
+    "test:cov": ""
   }
 }
