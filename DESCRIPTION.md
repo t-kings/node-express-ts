@@ -25,15 +25,15 @@ Periodically clear the database to remove expired records
 
 ### Expectations and Clarifications:
 1. Server should be able to handle highly concurrent workloads
-Selling should be optimized so that the maximum quantity of an item can be sold across multiple sell-api calls.
-2. A sell-api call should not be able to sell a quantity of the item which is more than the non-expired quantity of the item.
-3. You should optimize for both readability and performance.
-4. Your submission should include comprehensive tests.
-5. For the http-server, please use express
-6. For the database, please use any relational database
-7. For interacting with the database, use whichever tool you prefer
-8. Write the code with the same mindset as you would for a real world project
-9. The solution should be submitted in the form of a deployed public server and the code should be shared in the form of a gzipped/zipped git repository over email
+2. Selling should be optimized so that the maximum quantity of an item can be sold across multiple sell-api calls.
+3. A sell-api call should not be able to sell a quantity of the item which is more than the non-expired quantity of the item.
+4. You should optimize for both readability and performance.
+5. Your submission should include comprehensive tests.
+6. For the http-server, please use express
+7. For the database, please use any relational database
+8. For interacting with the database, use whichever tool you prefer
+9. Write the code with the same mindset as you would for a real world project
+10. The solution should be submitted in the form of a deployed public server and the code should be shared in the form of a gzipped/zipped git repository over email
 
 
 
@@ -59,7 +59,7 @@ Let's say we have 2 items foo & bar. And let's assume an initial starting time t
 - t=t0+20000, GET /foo/quantity, IN: {}, 
   - OUT: {quantity: 0, validTill: null}
 
-1. item=bar:
+2. item=bar:
 
 - t=t0, POST /bar/add, IN: {expiry: t0+10000, quantity: 10}, 
 	- OUT: {}
