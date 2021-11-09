@@ -37,7 +37,7 @@
     "lint:format": "yarn format && yarn lint",
     "prepare": "husky install",
     "format": "prettier --config .prettierrc src/**/*.ts --write",
-    "test": "jest --passWithNoTests",
+    "test": "jest --config ./jest-e2e.json --passWithNoTests ",
     "test:watch": "jest --watch --passWithNoTests",
     "test:cov": "jest --coverage --passWithNoTests",
     "test:e2e": "jest --config ./test/jest-e2e.json --passWithNoTests --detectOpenHandles",

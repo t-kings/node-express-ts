@@ -33,7 +33,8 @@ describe('Schema Validator', () => {
 
   it('failing error field should be an array', () => {
     const errors = schemaValidator(schema, { ...body, quantity: '4000' }); // passing string in place of number
-    expect(typeof errors.quantity).toBe('array');
+    expect(errors.quantity.length).toBeDefined();
+    expect(errors.quantity.concat).toBeDefined();
   });
 
   it('error message should be accurate to failing schema part failing', () => {
@@ -42,13 +43,13 @@ describe('Schema Validator', () => {
       'quantity is of wrong type. number expected'
     );
 
-    const expiry = new Date().getTime() + 5 * 60 * 1000;
+    const expiry = new Date().getTime() - 5 * 60 * 1000;
     errors = schemaValidator(schema, {
       ...body,
       expiry
     }); // removed 5 minutes to make expiry time passed
 
-    expect(errors.quantity[0].includes(`${expiry} is less than `)).toBeTruthy();
+    expect(errors.expiry[0].includes('expiry is less than ')).toBeTruthy();
 
     errors = schemaValidator(schema, {
       expiry

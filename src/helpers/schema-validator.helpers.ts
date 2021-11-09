@@ -19,9 +19,11 @@ export const schemaValidator = (
   /**
    * loop through entries of schema to get params and checks
    */
-  Object.entries(schema).forEach(([Schema, checks]) => {
-    const bodyValue = body[Schema];
-
+  Object.entries(schema).forEach(([field, checks]) => {
+    let bodyValue = body[field];
+    if (bodyValue === 'string') {
+      bodyValue = !bodyValue.trim();
+    }
     /**
      * loop through validity checks for each param
      */
@@ -31,34 +33,28 @@ export const schemaValidator = (
        * @param error to add to errors
        */
       const pushError = (error: string) => {
-        errors[bodyValue] = errors[bodyValue]
-          ? errors[bodyValue].concat([error])
-          : [error];
+        errors[field] = errors[field] ? errors[field].concat([error]) : [error];
       };
 
       /**
        * check for required property
        */
-      if (checkName === 'required' && checkValue === true) {
-        if (!bodyValue) {
-          pushError(`${bodyValue} is required`);
-        } else if (typeof bodyValue === 'string' && !bodyValue.trim()) {
-          pushError(`${bodyValue} is required`);
-        }
+      if (checkName === 'required' && checkValue && !bodyValue) {
+        pushError(`${field} is required`);
       }
 
       /**
        * check for param type
        */
       if (checkName === 'type' && typeof bodyValue !== checkValue) {
-        pushError(`${bodyValue} is of wrong type. ${checkValue} expected`);
+        pushError(`${field} is of wrong type. ${checkValue} expected`);
       }
 
       /**
        * check for min
        */
-      if (checkName === 'min' && bodyValue > checkValue) {
-        pushError(`${bodyValue} is less than ${checkValue}`);
+      if (checkName === 'min' && bodyValue < checkValue) {
+        pushError(`${field} is less than min : ${checkValue}`);
       }
     });
   });
