@@ -9,7 +9,7 @@ import {
   SchemaType,
   schemaValidator
 } from '../helpers/schema-validator.helpers';
-import { ResponseStatus } from '../types/response.types';
+import { httpResponse } from '../utils';
 
 /**
  *
@@ -45,22 +45,14 @@ export function validator(
         /**
          * return with error code 400
          */
-        return res.sendStatus(400).json({
-          message: 'validation error',
-          data: errors,
-          meta: {},
-          status: ResponseStatus.Error
+        return httpResponse.validationError(res, {
+          data: errors
         });
       }
     }
     next();
   } catch (e: any) {
-    res.sendStatus(500).json({
-      message: 'internal server error',
-      data: null,
-      meta: {},
-      status: ResponseStatus.Error
-    });
+    return httpResponse.internalServerError(res);
   }
 }
 

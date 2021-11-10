@@ -9,7 +9,7 @@ export class SellLog extends Model {}
 SellLog.init(
   {
     item: { type: DataTypes.STRING, allowNull: false },
-    quantity: { type: DataTypes.INTEGER, allowNull: false }
+    quantity: { type: DataTypes.INTEGER, allowNull: false } //quantity sold
   },
   { sequelize, modelName: 'sellLog', timestamps: true }
 );

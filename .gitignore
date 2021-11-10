@@ -10,8 +10,10 @@ Logs
 /node_modules
 
 
+
 # Environment
 .env
+config.json
 
 # Test Files
 /coverage

@@ -1,0 +1,20 @@
+{
+    "dev": {
+        "driver": "",
+        "user": "",
+        "database": "",
+        "password": ""
+    },
+    "test": {
+        "driver": "",
+        "user": "",
+        "database": "",
+        "password": ""
+    },
+    "prod": {
+        "driver": "",
+        "user": "",
+        "database": "",
+        "password": ""
+    }
+}
