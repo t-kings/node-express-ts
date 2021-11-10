@@ -3,7 +3,7 @@
  */
 
 import { Sequelize, Model, DataTypes } from 'sequelize';
-const sequelize = new Sequelize('sqlite::memory:');
+const sequelize = new Sequelize('mysql::memory:');
 
 export class DeleteLog extends Model {}
 DeleteLog.init(
