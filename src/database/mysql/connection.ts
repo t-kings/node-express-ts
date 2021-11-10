@@ -25,7 +25,7 @@ export const mysqlDatabase = async (callbackError?: any) => {
       // Create item table
       await createTable(
         'item',
-        'id INT AUTO_INCREMENT PRIMARY KEY, item VARCHAR(255), quantity BIGINT(18), expiry INT(11)'
+        'id INT AUTO_INCREMENT PRIMARY KEY, item VARCHAR(255), quantity BIGINT, expiry INT(11)'
       );
     });
 

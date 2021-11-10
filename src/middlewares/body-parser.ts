@@ -30,7 +30,20 @@ export const bodyParser = async (
           req.on('end', function () {
             buffer += decoder.end();
             // Construct the data object to send to the handler
-            resolve(JSON.parse(buffer || '{}'));
+            try {
+              resolve(JSON.parse(buffer || '{}'));
+            } catch (error) {
+              const keyValueStrings = buffer.split('&');
+              const body: any = {};
+              keyValueStrings.forEach((keyValueString) => {
+                body[keyValueString.split('=')[0]] = !isNaN(
+                  keyValueString.split('=')[1] as unknown as number
+                )
+                  ? parseFloat(keyValueString.split('=')[1])
+                  : keyValueString.split('=')[1];
+              });
+              resolve(body);
+            }
           });
         } catch (error) {
           reject(error);
