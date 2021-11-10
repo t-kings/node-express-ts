@@ -13,7 +13,6 @@ Logs
 
 # Environment
 .env
-config.json
 
 # Test Files
 /coverage

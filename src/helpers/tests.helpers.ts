@@ -2,14 +2,14 @@
  * Helpers for testing files
  */
 
-export const mockUpDatabase = async () => {
-  /**
-   * TODO: Populate Database with mock values
-   */
-};
+import { mysqlActions } from '../database';
 
 export const clearMockFromDatabase = async () => {
-  /**
-   * TODO: Clear Database back to Default
-   */
+  const tables = ['item'];
+  for (let index = 0; index < tables.length; index++) {
+    const table = tables[index];
+    await mysqlActions.clearTable(table);
+  }
+
+  return;
 };

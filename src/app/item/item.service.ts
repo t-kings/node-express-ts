@@ -2,8 +2,7 @@
  * @description Manage services of item
  */
 
-import { Item, SellLog } from '../../database';
-import { Op } from 'sequelize';
+import { Item, mysqlActions } from '../../database';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -17,21 +16,31 @@ const deadZone = parseInt(process.env.DEAD_ZONE || '0');
  * @param data data to process
  */
 export const addService = async (item: string, data: Record<string, any>) => {
-  const _item = await Item.findOne({
-    where: {
-      item,
-      expiry: data.expiry
-    },
-    raw: true
-  });
+  try {
+    const _item = (await mysqlActions.findOne(
+      'item',
+      `item = '${item}' AND expiry = '${data.expiry}'`
+    )) as Item;
 
-  if (!_item) {
-    await Item.create({ quantity: data.quantity, expiry: data.expiry, item });
-  } else {
-    const _itemJson = _item.toJSON() as { quantity: number; expiry: number };
-    await _item.update({ quantity: _itemJson.quantity + data.quantity });
+    if (!_item) {
+      await mysqlActions.create('item', {
+        quantity: data.quantity,
+        expiry: data.expiry,
+        item
+      });
+    } else {
+      await mysqlActions.update(
+        'item',
+        `quantity = '${_item.quantity + data.quantity}'`,
+        `id = '${_item.id}'`
+      );
+    }
+    return true;
+  } catch (e) {
+    console.log(e);
+
+    return false;
   }
-  return true;
 };
 
 /**
@@ -40,26 +49,17 @@ export const addService = async (item: string, data: Record<string, any>) => {
  */
 export const quantityService = async (item: string) => {
   const now = new Date().getTime();
-  const items = await Item.findAll({
-    where: {
-      item,
-      expiry: {
-        [Op.gte]: now + deadZone
-      },
-      quantity: {
-        [Op.gt]: 0
-      }
-    },
-    raw: true
-  });
+  const items = (await mysqlActions.findAll(
+    'item',
+    `item = '${item}' AND expiry >= '${now + deadZone}' AND quantity > '0'`
+  )) as Item[];
 
   return items.reduce(
     (prev, current) => {
-      const _current = current.toJSON() as { quantity: number; expiry: number };
       return {
-        quantity: prev.quantity + _current.quantity,
+        quantity: prev.quantity + current.quantity,
         validTill:
-          _current.expiry <= prev.validTill ? _current.expiry : prev.validTill
+          current.expiry <= prev.validTill ? current.expiry : prev.validTill
       };
     },
     {
@@ -76,26 +76,18 @@ export const quantityService = async (item: string) => {
  */
 export const sellService = async (item: string, data: Record<string, any>) => {
   const now = new Date().getTime();
-  const items = await Item.findAll({
-    where: {
-      item,
-      expiry: {
-        [Op.gte]: now + deadZone
-      },
-      quantity: {
-        [Op.gt]: 0
-      }
-    },
-    raw: true
-  });
+
+  const items = (await mysqlActions.findAll(
+    'item',
+    `item = '${item}' AND expiry >= '${now + deadZone}' AND quantity > '0'`
+  )) as Item[];
 
   const reducedItem = items.reduce(
     (prev, current) => {
-      const _current = current.toJSON() as { quantity: number; expiry: number };
       return {
-        quantity: prev.quantity + _current.quantity,
+        quantity: prev.quantity + current.quantity,
         validTill:
-          _current.expiry <= prev.validTill ? _current.expiry : prev.validTill
+          current.expiry <= prev.validTill ? current.expiry : prev.validTill
       };
     },
     {
@@ -113,9 +105,7 @@ export const sellService = async (item: string, data: Record<string, any>) => {
    * Sort items from nearest to expire to farthest to expire
    */
   const sortedItemsByExpiry = items.sort((a, b) => {
-    const _a = a.toJSON() as { quantity: number; expiry: number };
-    const _b = b.toJSON() as { quantity: number; expiry: number };
-    return _a.expiry - _b.expiry;
+    return a.expiry - b.expiry;
   });
 
   let quantityLeftToSell = data.quantity;
@@ -125,13 +115,20 @@ export const sellService = async (item: string, data: Record<string, any>) => {
    */
   for (let index = 0; index < sortedItemsByExpiry.length; index++) {
     const _item = sortedItemsByExpiry[index];
-    const _itemJson = _item.toJSON() as { quantity: number; expiry: number };
-    if (_itemJson.quantity > quantityLeftToSell) {
-      await _item.update({ quantity: _itemJson.quantity - quantityLeftToSell });
+    if (_item.quantity > quantityLeftToSell) {
+      await mysqlActions.update(
+        'item',
+        `quantity = '${_item.quantity - quantityLeftToSell}'`,
+        `id = '${_item.id}'`
+      );
       break;
     } else {
-      quantityLeftToSell = quantityLeftToSell - _itemJson.quantity;
-      await _item.update({ quantity: 0 });
+      quantityLeftToSell = quantityLeftToSell - _item.quantity;
+      await mysqlActions.update(
+        'item',
+        `quantity = '${0}'`,
+        `id = '${_item.id}'`
+      );
       if (quantityLeftToSell === 0) {
         break;
       }
@@ -139,7 +136,6 @@ export const sellService = async (item: string, data: Record<string, any>) => {
   }
 
   const quantitySold = data.quantity - quantityLeftToSell;
-  await SellLog.create({ item, quantity: quantitySold });
   return quantitySold;
 };
 
@@ -148,15 +144,6 @@ export const sellService = async (item: string, data: Record<string, any>) => {
  */
 export const deleteExpiredItemsService = async () => {
   const now = new Date().getTime();
-  await Item.destroy({
-    where: {
-      [Op.or]: {
-        expiry: {
-          [Op.lte]: now
-        },
-        quantity: 0
-      }
-    }
-  });
+  await mysqlActions.remove('item', `expiry <= '${now}' OR quantity = '0'`);
   return true;
 };
