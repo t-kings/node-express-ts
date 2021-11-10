@@ -28,10 +28,9 @@ export const mysqlDatabase = async (callbackError?: any) => {
       mysqlConnection.on('error', function onError(err) {
         console.log('db error', err);
         if (err.code == 'PROTOCOL_CONNECTION_LOST') {
-          // Connection to the MySQL server is usually
           mysqlDatabase();
         } else {
-          throw err; // server variable configures this)
+          throw err;
         }
       });
 
