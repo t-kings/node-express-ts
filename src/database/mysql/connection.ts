@@ -19,8 +19,21 @@ export const mysqlConnection = mysql.createConnection({
 export const mysqlDatabase = async (callbackError?: any) => {
   try {
     mysqlConnection.connect(async (err) => {
-      if (err) throw err;
+      if (err) {
+        console.log('error when connecting to db:', err);
+        setTimeout(mysqlDatabase, 10000);
+      }
       console.log('Connected!');
+
+      mysqlConnection.on('error', function onError(err) {
+        console.log('db error', err);
+        if (err.code == 'PROTOCOL_CONNECTION_LOST') {
+          // Connection to the MySQL server is usually
+          mysqlDatabase();
+        } else {
+          throw err; // server variable configures this)
+        }
+      });
 
       // Create item table
       await createTable(
