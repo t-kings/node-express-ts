@@ -34,7 +34,7 @@ const quantity = async (req: Request, res: Response) => {
     const data = await quantityService(req.params.item);
     return data.quantity === 0
       ? httpResponse.notFoundError(res)
-      : httpResponse.httpCreated(res, { data });
+      : httpResponse.httpOk(res, { data });
   } catch (error) {
     return httpResponse.internalServerError(res);
   }

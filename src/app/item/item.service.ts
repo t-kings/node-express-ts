@@ -17,6 +17,8 @@ const deadZone = parseInt(process.env.DEAD_ZONE || '0');
  */
 export const addService = async (item: string, data: Record<string, any>) => {
   try {
+    console.log('data', data);
+
     const _item = (await mysqlActions.findOne(
       'item',
       `item = '${item}' AND expiry = '${data.expiry}'`

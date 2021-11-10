@@ -6,6 +6,7 @@ import express from 'express';
 import { responseTransformer } from './interceptors';
 import { itemRoutes } from './routes';
 import { mysqlDatabase } from './database';
+import { bodyParser } from './middlewares';
 
 // Initialize env
 dotenv.config();
@@ -14,13 +15,16 @@ dotenv.config();
 const app = express();
 
 /**
+ * Bind middleware
+ */
+app.use(bodyParser);
+
+/**
  * Bind routers
  */
 app.use(itemRoutes.entry, itemRoutes.router);
 
-/**
- * Bind middleware
- */
+// bind outgoing interceptors
 app.use(responseTransformer);
 
 /**
